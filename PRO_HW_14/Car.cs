@@ -9,7 +9,11 @@ namespace PRO_HW_14
     public class Car
     {
         public string Brand { get; set; }
+
+        [DisplayName]
         public string Model { get; set; }
+
+        [DisplayName]
         public string Year { get; set; }
         public string Color { get; set; }
 

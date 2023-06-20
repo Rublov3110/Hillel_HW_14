@@ -47,10 +47,13 @@ namespace PRO_HW_14
                 string result = "";
                 foreach (PropertyInfo property in properties)
                 {
-                    string fieldName = property.Name;
-                    object value = property.GetValue(obj);
+                    if (Attribute.IsDefined(property, typeof(DisplayNameAttribute)))
+                    {
+                        string fieldName = property.Name;
+                        object value = property.GetValue(obj);
 
-                    result += $"{fieldName}:{value};";
+                        result += $"{fieldName}:{value};";
+                    }
                 }
 
                 return result.TrimEnd(';');
@@ -59,42 +62,12 @@ namespace PRO_HW_14
             string formattedFields = FormatObjectFields(car);
             Console.WriteLine(formattedFields);
 
-            //object CreateString(string formattedString, Type type)
-            //{
-            //    object obj = Activator.CreateInstance(type);
 
-            //    string[] fields = formattedString.Split(';');
-            //    foreach (string field in fields)
-            //    {
-            //        string[] parts = field.Split(':');
-            //        string fieldName = parts[0];
-            //        string value = parts[1];
-
-            //        PropertyInfo property = type.GetProperty(fieldName);
-            //        if (property != null)
-            //        {
-            //            Type propertyType = property.PropertyType;
-            //            object convertedValue = Convert.ChangeType(value, propertyType);
-            //            property.SetValue(obj, convertedValue);
-            //        }
-            //    }
-
-            //    return obj;
-            //}
-
-            //Type type = typeof(Car);
-            //object obj = CreateString(formattedFields, type);
-
-            //Car myObj = (Car)obj;
-            //Console.WriteLine(myObj.Brand);
-            //Console.WriteLine(myObj.Model);
-            //Console.WriteLine(myObj.Year);
-            //Console.WriteLine(myObj.Color);
-
-             T CreateString<T>(string formattedString)
+            object CreateString(string formattedString, Type type)
             {
-                Type type = typeof(T);
-                T obj = Activator.CreateInstance<T>();
+                object obj = Activator.CreateInstance(type);
+                var type1 = obj.GetType();
+                var properties = type1.GetProperties();
 
                 string[] fields = formattedString.Split(';');
                 foreach (string field in fields)
@@ -104,7 +77,7 @@ namespace PRO_HW_14
                     string value = parts[1];
 
                     PropertyInfo property = type.GetProperty(fieldName);
-                    if (property != null)
+                    if (Attribute.IsDefined(property, typeof(DisplayNameAttribute)))
                     {
                         Type propertyType = property.PropertyType;
                         object convertedValue = Convert.ChangeType(value, propertyType);
@@ -115,13 +88,64 @@ namespace PRO_HW_14
                 return obj;
             }
 
+            Type type = typeof(Car);
+            object obj = CreateString(formattedFields, type);
 
-            Car myObj1 = CreateString<Car>(formattedFields);
+            Car myObj = (Car)obj;
+            //Console.WriteLine(myObj.Brand);
+            //Console.WriteLine(myObj.Model);
+            //Console.WriteLine(myObj.Year);
+            //Console.WriteLine(myObj.Color);
 
-            Console.WriteLine(myObj1.Brand);
-            Console.WriteLine(myObj1.Model);
-            Console.WriteLine(myObj1.Year);
-            Console.WriteLine(myObj1.Color);
+            // T CreateString<T>(string formattedString)
+            //{
+            //    Type type = typeof(T);
+            //    T obj = Activator.CreateInstance<T>();
+
+            //    string[] fields = formattedString.Split(';');
+            //    foreach (string field in fields)
+            //    {
+            //        string[] parts = field.Split(':');
+            //        string fieldName = parts[0];
+            //        string value = parts[1];
+
+            //        PropertyInfo property = type.GetProperty(fieldName);
+            //        if (Attribute.IsDefined(property, typeof(DisplayNameAttribute)))
+            //        {
+            //            Type propertyType = property.PropertyType;
+            //            object convertedValue = Convert.ChangeType(value, propertyType);
+            //            property.SetValue(obj, convertedValue);
+            //        }
+            //    }
+
+            //    return obj;
+            //}
+
+            void PrintDisplay(object obj)
+            {
+                var type = obj.GetType();
+                var properties = type.GetProperties();
+                
+
+                foreach (var property in properties)
+                {
+                    if (Attribute.IsDefined(property, typeof(DisplayNameAttribute)))
+                    {
+                        foreach (var attr in property.GetCustomAttributes(false))
+                            Console.WriteLine(attr);
+                        Console.WriteLine($"{property.Name}:{property.GetValue(obj)}");
+                    }
+                }
+            }
+
+            //Car myObj1 = CreateString<Car>(formattedFields);
+            PrintDisplay(obj);
+
+
+            //Console.WriteLine(myObj1.Brand);
+            //Console.WriteLine(myObj1.Model);
+            //Console.WriteLine(myObj1.Year);
+            //Console.WriteLine(myObj1.Color);
         }  
     }
 }
